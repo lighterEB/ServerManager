@@ -1,0 +1,19 @@
+# Qt-specific
+*.pro.user
+*.qmake.stash
+Makefile*
+*build-*
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Debug files
+*.pdb
