@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <QLineEdit>
 #include <QSpinBox>
+#include <QRegularExpression>
 #include "server.h"
 
 class ServerDialog : public QDialog
@@ -22,6 +23,8 @@ private:
     QLineEdit *ipEdit;
     QSpinBox *portSpinBox;
     bool isValidIpFormat(const QString &ip) const;
+
+    static const QRegularExpression ipRegex;
 };
 
 #endif // SERVERDIALOG_H

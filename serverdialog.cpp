@@ -2,6 +2,10 @@
 #include <QFormLayout>
 #include <QPushButton>
 #include <QDialogButtonBox>
+#include <QRegularExpression>
+
+// 定义静态成员变量
+const QRegularExpression ServerDialog::ipRegex("^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$");
 
 ServerDialog::ServerDialog(QWidget *parent, const Server *server)
     : QDialog(parent)
@@ -49,6 +53,19 @@ ServerDialog::ServerDialog(QWidget *parent, const Server *server)
     mainLayout->addWidget(buttonBox);
 
     setLayout(mainLayout);
+
+    connect(ipEdit, &QLineEdit::textChanged, this, [this]() {
+        if(isValidIpFormat(ipEdit->text())) {
+            ipEdit -> setStyleSheet("");
+        }else {
+            ipEdit -> setStyleSheet("background-color: #FFCCCC;");
+        }
+    });
+}
+
+bool ServerDialog::isValidIpFormat(const QString &ip) const
+{
+    return ipRegex.match(ip).hasMatch();
 }
 
 bool ServerDialog::isValid() const
@@ -56,13 +73,22 @@ bool ServerDialog::isValid() const
     return !nameEdit->text().isEmpty() &&
            !usernameEdit->text().isEmpty() &&
            !passwordEdit->text().isEmpty() &&
-           !ipEdit->text().isEmpty();
+           isValidIpFormat(ipEdit->text());
 }
 
 Server ServerDialog::getServer() const
 {
-    if (!isValid()) {
-        throw std::runtime_error("无效的服务器信息");
+    if (nameEdit->text().isEmpty()) {
+        throw std::runtime_error("服务器名称不能为空");
+    }
+    if (usernameEdit->text().isEmpty()) {
+        throw std::runtime_error("用户名不能为空");
+    }
+    if (passwordEdit->text().isEmpty()) {
+        throw std::runtime_error("密码不能为空");
+    }
+    if (!isValidIpFormat(ipEdit->text())) {
+        throw std::runtime_error("无效的IP地址格式");
     }
     return Server(nameEdit->text(), usernameEdit->text(), passwordEdit->text(),
                   ipEdit->text(), portSpinBox->value());
